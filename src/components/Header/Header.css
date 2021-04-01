@@ -1,0 +1,10 @@
+.container{
+    align-self: flex-start;
+    margin-top: 20px;
+}
+.nav-item{
+    margin: 0px 15px;
+}
+.navbar-brand{
+    padding-right: 70%;
+}
