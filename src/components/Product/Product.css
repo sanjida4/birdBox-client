@@ -1,0 +1,36 @@
+.single-product{
+    cursor: pointer;
+    background: #FFFFFF;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+}
+.single-product .img-wrapper{
+    padding: 20px 30px 20px 30px;
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.single-product .card-body{
+    padding-bottom: 0px;
+}
+.custom-product a{
+    text-decoration: none;
+    color: #000;
+}
+.single-product h3{
+    text-transform: uppercase;
+    margin: 0px;
+    padding: 0px;
+}
+
+.card.single-product:hover img{
+    transition: 0.5s;
+    transform: scale(1);
+}
+.card.single-product img{
+    transform: scale(0.5);
+}
+
+.single-product .product-price{
+    color: #6946F4;
+}

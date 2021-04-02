@@ -3,89 +3,91 @@ import "firebase/auth";
 import firebaseConfig from './firebase.config';
 
 export const initializeLoginFramework = () => {
-    if(firebase.apps.length === 0) {
+    if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
 }
 
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+const setJwtToken = () => {
+    firebase.auth().currentUser.getIdToken(true).then(function (idToken) {
+        sessionStorage.setItem('devshop-token', idToken);
+        return true;
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
+
 export const handleGoogleSignIn = () => {
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
-    return firebase.auth().signInWithPopup(googleProvider)
-    .then(res => {
-      const {displayName, photoURL, email} = res.user;
-      const signedInUser = {
-        isSignedIn: true,
-        name: displayName,
-        email: email,
-        photo: photoURL,
-        success: true
-      };
-      return signedInUser;
-    })
-    .catch(err => {
-      console.log(err);
-      console.log(err.message);
-    })
-  }
+    return firebase.auth()
+        .signInWithPopup(googleProvider)
+        .then((result) => {
+            const { displayName, photoURL, email } = result.user;
+            const signedInUser = {
+                isSignedIn: true,
+                name: displayName,
+                email: email,
+                photo: photoURL
+            }
 
-  export const handleSignOut = () => {
-    return firebase.auth().signOut()
-    .then(res => {
-      const signedOutUser = {
-        isSignedIn: false,
-        name: '',
-        email: '',
-        photo: '',
-        error: '',
-        success: false
-      }
-      return signedOutUser;
-    }).catch(err => {
-      console.log(err);
-    });
-  }
+            setJwtToken();
 
- export const createUserWithEmailAndPassword = (name, email, password) => {
-    return firebase.auth().createUserWithEmailAndPassword(email, password)
-    .then( res => {
-      const newUserInfo = res.user;
-      newUserInfo.error = '';
-      newUserInfo.success = true;
-      updateUserName(name);
-      return newUserInfo;
-    })
-    .catch( error => {
-      const newUserInfo = {};
-      newUserInfo.error = error.message;
-      newUserInfo.success = false;
-      return newUserInfo;
-    });
- }
+            return signedInUser;
+        }).catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            const email = error.email;
+            const credential = error.credential;
+            return errorMessage;
+        });
+}
 
- export const signInWithEmailAndPassword = (email, password) =>{
-    return firebase.auth().signInWithEmailAndPassword(email, password)
-    .then(res => {
-      const newUserInfo = res.user;
-      newUserInfo.error = '';
-      newUserInfo.success = true;
-      return newUserInfo;
-    })
-    .catch(function(error) {
-      const newUserInfo = {};
-      newUserInfo.error = error.message;
-      newUserInfo.success = false;
-      return newUserInfo;
-    });
- }
+export const createUserWithCredentials = (user) => {
+    return firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+        .then((userCredential) => {
+            const loggedInUser = firebase.auth().currentUser;
+            updateProfile(loggedInUser, user);
+            const getUserData = firebase.auth().currentUser;
+            const newUser = {
+                name: user.name,
+                email: getUserData.email,
+                isSignedIn: true
+            };
+            return newUser;
+        })
+        .catch((error) => {
+            const errorMessage = error.message;
+            return errorMessage;
+        });
+}
 
- const updateUserName = name =>{
-    const user = firebase.auth().currentUser;
+const updateProfile = (user, data) => {
 
     user.updateProfile({
-      displayName: name
-    }).then(function() {
-      console.log('Username updated successfully')
-    }).catch(function(error) {
-      console.log(error)
+        displayName: data.name,
+    }).then(res => {
+        return true;
+    }).catch(function (error) {
+        return false;
     });
-  }
+}
+
+export const userLogin = (user) => {
+    return firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+        .then((userCredential) => {
+            const loggedInUser = userCredential.user;
+            const currentUser = {
+                name: loggedInUser.displayName,
+                email: user.email,
+                isSignedIn: true
+            }
+
+            setJwtToken();
+
+            return currentUser;
+        })
+        .catch((error) => {
+            return 'error';
+        });
+}

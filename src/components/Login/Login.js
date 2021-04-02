@@ -1,116 +1,154 @@
-import React, { useState } from 'react';
-import { useContext } from 'react';
+import React, { useContext, useState } from 'react';
+import Header from '../Header/Header';
+import './Login.css';
+import { useForm } from "react-hook-form";
+import { createUserWithCredentials, handleGoogleSignIn, initializeLoginFramework, userLogin } from './LoginManager';
 import { UserContext } from '../../App';
 import { useHistory, useLocation } from 'react-router-dom';
-import { initializeLoginFramework, handleGoogleSignIn, handleSignOut,createUserWithEmailAndPassword, signInWithEmailAndPassword } from './LoginManager';
 
+const Login = () => {
+    const [user, setUser] = useContext(UserContext);
+    const { register, handleSubmit, errors } = useForm();
+    const [login, setLogin] = useState(true);
+    const [showError, setShowError] = useState(false);
+    const [loader, setLoader] = useState(false);
+    const [passNotMatched, setPassNotMatched] = useState(false);
+    const history = useHistory();
+    const location = useLocation();
+    const { from } = location.state || { from: { pathname: "/" } };
 
+    initializeLoginFramework();
 
-function Login() {
-  const [newUser, setNewUser] = useState(false);
-  const [user, setUser] = useState({
-    isSignedIn: false,
-    name: '',
-    email: '',
-    password: '',
-    photo: ''
-  });
-
-  initializeLoginFramework();
-
-  const [loggedInUser, setLoggedInUser ] = useContext(UserContext);
-  const history = useHistory();
-  const location = useLocation();
-  let { from } = location.state || { from: { pathname: "/" } };
-
-  const googleSignIn = () => {
-      handleGoogleSignIn()
-      .then(res => {
-        handleResponse(res, true);
-      })
-  }
-
-  const signOut = () => {
-      handleSignOut()
-      .then(res => {
-          handleResponse(res, false);
-      })
-  }
-
-  const handleResponse = (res, redirect) =>{
-    setUser(res);
-    setLoggedInUser(res);
-    if(redirect){
-        history.replace(from);
-    }
-  }
-
-  const handleBlur = (e) => {
-    let isFieldValid = true;
-    if(e.target.name === 'email'){
-      isFieldValid = /\S+@\S+\.\S+/.test(e.target.value);
-    }
-    if(e.target.name === 'password'){
-      const isPasswordValid = e.target.value.length > 6;
-      const passwordHasNumber =  /\d{1}/.test(e.target.value);
-      isFieldValid = isPasswordValid && passwordHasNumber;
-    }
-    if(isFieldValid){
-      const newUserInfo = {...user};
-      newUserInfo[e.target.name] = e.target.value;
-      setUser(newUserInfo);
-    }
-  }
-  const handleSubmit = (e) => {
-    if(newUser && user.email && user.password){
-      createUserWithEmailAndPassword(user.name, user.email, user.password)
-      .then(res => {
-        handleResponse(res, true);
-      })
+    const loginSubmit = data => {
+        setLoader(true);
+        userLogin(data)
+            .then(res => {
+                setLoader(false);
+                if (res === 'error') {
+                    setShowError(true);
+                } else {
+                    setUser(res);
+                    setShowError(true);
+                    history.replace(from);
+                }
+            })
+            .catch(err => console.log('error', err));
     }
 
-    if(!newUser && user.email && user.password){
-      signInWithEmailAndPassword(user.email, user.password)
-      .then(res => {
-        handleResponse(res, true);
-      })
+    const registerSubmit = data => {
+        setLoader(true);
+        if (data.password !== data.samePassword) {
+            setLoader(false);
+            setPassNotMatched(true);
+        } else {
+            setLoader(false);
+            setPassNotMatched(false);
+            createUserWithCredentials(data)
+                .then(res => {
+                    setUser(res);
+                    // history.replace(from);
+                })
+                .catch(err => console.log(err));
+        }
     }
-    e.preventDefault();
-  }
 
+    const googleSignIn = () => {
+        setLoader(true);
+        handleGoogleSignIn()
+            .then(res => {
+                setLoader(false);
+                setUser(res);
+                history.replace(from);
+            }).
+            catch(err => console.log(err));
+    }
 
+    return (
 
-  return (
-    <div style={{textAlign: 'center', marginTop: '40px'}}>
+        <div>
+            <Header></Header>
 
-      <h1>Authentication System</h1>
-      <input type="checkbox" onChange={() => setNewUser(!newUser)} name="newUser" id=""/>
-      <label htmlFor="newUser">Sign up</label>
-      <form onSubmit={handleSubmit}>
-        {newUser && <input name="name" type="text" onBlur={handleBlur} placeholder="Name" required/>}
-        <br/>
-        <input type="text" name="email" onBlur={handleBlur} placeholder="Email address" required/>
-        <br/><br/>
-        <input type="password" name="password" onBlur={handleBlur} placeholder="Password" required/>
-        <br/><br/>
-        <input type="submit" value={newUser ? 'Sign up' : 'Sign in'}/>
-      </form>
-      <p style={{color: 'red'}}>{user.error}</p>
-      { user.success && <p style={{color: 'green'}}>User { newUser ? 'created' : 'Logged In'} successfully</p>}
+            <div className="container custom-container d-flex justify-content-center align-items-center mt-5">
+                <div className="custom-flexbox">
 
-      
-      { user.isSignedIn ? <button onClick={signOut}>Sign Out</button> :
-        <button className='btn btn-primary' onClick={googleSignIn}>Sign In with google</button>
-      }
-      <br/>
-      {
-        user.isSignedIn && <div>
-          <p>Welcome, {user.name}!</p>
+                    {
+                        loader && (
+                            <div className="d-flex justify-content-center mb-3">
+                                <div className="spinner-border" role="status">
+                                </div>
+                            </div>
+                        )
+                    }
+
+                    <div className="card login-form">
+                        <div className="card-body p-4">
+                            <h3 className="card-title text-center">{login ? 'Login' : 'Register'}</h3>
+                            <div className="card-text">
+                                {
+                                    login ? (
+                                        <form onSubmit={handleSubmit(loginSubmit)}>
+                                            <div className="form-group mb-3">
+                                                <label htmlFor="exampleInputEmail1">Email address</label>
+                                                <input name="email" required placeholder="Your Email" type="email" ref={register({ pattern: /(.+)@(.+){2,}\.(.+){2,}/ })} className="form-control form-control-sm" />
+                                                {errors.email && <span>Please Enter a valid email address</span>}
+                                                {showError && <span>Username or password is invalid</span>}
+                                            </div>
+                                            <div className="form-group mb-3">
+                                                <label htmlFor="exampleInputPassword1">Password</label>
+                                                <input name="password" ref={register({ required: true })} placeholder="Password" type="password" className="form-control form-control-sm" />
+                                                {errors.password && <span>This field is required</span>}
+                                            </div>
+                                            <button type="submit" className="btn btn-primary site-btn">Login</button>
+
+                                            <div className="sign-up m-2 text-center">
+                                                Don't have an account? <button className="custom-btn" onClick={() => setLogin(!login)}>Create An Account</button>
+                                            </div>
+                                        </form>
+                                    ) :
+                                        (
+                                            <form onSubmit={handleSubmit(registerSubmit)}>
+                                                <div className="form-group mb-3">
+                                                    <label htmlFor="exampleInputEmail1">Name</label>
+                                                    <input placeholder="Your Name" name="name" type="text" ref={register({ required: true })} className="form-control form-control-sm" />
+                                                    {errors.name && <span>Name is required</span>}
+                                                </div>
+                                                <div className="form-group mb-3">
+                                                    <label htmlFor="exampleInputEmail1">Email address</label>
+                                                    <input name="email" placeholder="Your Email" type="email" ref={register({ pattern: /(.+)@(.+){2,}\.(.+){2,}/ })} className="form-control form-control-sm" />
+                                                    {errors.email && <span>Please Enter a valid email address</span>}
+                                                </div>
+                                                <div className="form-group mb-3">
+                                                    <label htmlFor="exampleInputPassword1">Password</label>
+                                                    <input name="password" ref={register({ required: true })} placeholder="Password" type="password" className="form-control form-control-sm" />
+                                                    {errors.password && <span>This field is required</span>}
+                                                </div>
+                                                <div className="form-group mb-3">
+                                                    <label htmlFor="exampleInputPassword1">Retype Password</label>
+                                                    <input type="password" name="samePassword" ref={register({ required: true })} placeholder="Retype Password" className="form-control form-control-sm" />
+                                                    {errors.password && <span>This field is required</span>}
+                                                    {passNotMatched && <span>Password Not Matched</span>}
+                                                </div>
+                                                <button type="submit" className="btn btn-primary site-btn">Register</button>
+
+                                                <div className="sign-up m-2 text-center">
+                                                    Already Have an account? <button className="custom-btn" onClick={() => setLogin(!login)}>Login</button>
+                                                </div>
+                                            </form>
+                                        )
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-3 login-form">
+                        <h5 className="line"><span>OR</span></h5>
+                        <button onClick={googleSignIn} className="w-100 btn btn-primary social-btn mb-2"><span>Continue With Google </span></button>
+                    </div>
+
+                </div>
+            </div>
         </div>
-      }
-
-    </div>
-  );
-}
+    );
+};
 
 export default Login;

@@ -1,36 +1,59 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import Header from '../Header/Header';
 
+const Checkout = () => {
+    const { id } = useParams();
+    const [product, setProduct] = useState({});
 
-const Cart = (props) => {
-    const cart = props.cart;
+    useEffect(() => {
+        fetch(`https://apple-pudding-44312.herokuapp.com/product/${id}`)
+            .then(res => res.json())
+            .then(data => setProduct(data))
+            .catch(error => console.log(error))
+    }, [id]);
 
-    let total = 0;
-    for(let i = 0; i< cart.length; i++){
-        const product = cart[i];
-        console.log(product.price, product.quantity)
-        total = total + product.price * product.quantity || 1;
-    }
+    sessionStorage.setItem('productId', product._id);
 
-    const tax = (total / 10).toFixed(2);
-    const grandTotal = (total + Number(tax)).toFixed(2);
-
-    const formatNumber = num => {
-        const precision = num.toFixed(2);
-        return Number(precision);
-    }
     return (
-        <div style = {{marginLeft: '20px'}}>
-            <h4>Your Cart:</h4>
-            <p>Birds Ordered: {cart.length}</p>
-            <p>Price: {formatNumber(total)}</p>
-            <p><small>Tax + VAT: {tax}</small></p>
-            <p>Total Price: {grandTotal}</p>
-            <br/>
-            {
-                props.children
-            }
+        <div>
+            <Header />
+            <div className="container">
+                <div className="row">
+                    <div className="col-md-12">
+                        <h3 className="mt-5 mb-5 centerText">Cart</h3>
+
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{product?.name}</td>
+                                    <td>1</td>
+                                    <td>${product?.price}</td>
+                                </tr>
+
+                                <tr style={{ border: '1px solid transparent' }}>
+                                    <td colSpan="3"><strong>Total</strong></td>
+                                    <td><strong>${product?.price}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div className="d-flex justify-content-end pe-0">
+                            <Link to="/checkout"><button className="btn btn-primary site-btn" >Checkout</button></Link>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
     );
 };
 
-export default Cart;
+export default Checkout;

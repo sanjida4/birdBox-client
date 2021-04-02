@@ -1,3 +1,11 @@
-.App {
-  text-align: center;
+.site-btn{
+  padding: 10px 30px;
+  background: #6946F4;
+  color: #fff;
+}
+.site-btn.search-btn{
+  border-radius: 0px;
+}
+.search-input{
+  border-radius: 0px;
 }

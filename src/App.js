@@ -1,64 +1,61 @@
-import React, { useState } from 'react';
 import './App.css';
-import Header from './components/Header/Header';
-import Home from './components/Home/Home';
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
-import PlaceOrder from './components/PlaceOrder/PlaceOrder';
-import Admin from './components/Admin/Admin';
+import Home from './components/Home/Home';
 import NotFound from './components/NotFound/NotFound';
-// import ProductDetail from './components/ProductDetail/ProductDetail';
-import Shipment from './components/Shipment/Shipment';
+import { createContext, useState } from 'react';
+import Cart from './components/Cart/Cart';
+import Checkout from './components/Checkout/Checkout';
 import Login from './components/Login/Login';
-import { createContext } from 'react';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import Admin from './components/Admin/Admin';
+import Order from './components/Order/Order';
 
 export const UserContext = createContext();
 
-function App(props) {
-  const [loggedInUser, setLoggedInUser] = useState({});
-
+function App() {
+  const [user, setUser] = useState({});
   return (
-    <UserContext.Provider value = {[loggedInUser, setLoggedInUser]}>
-      {/* <h3>email: {loggedInUser.email}</h3> */}
+    <UserContext.Provider value={[user, setUser]}>
       <Router>
-        <Header></Header>
-
         <Switch>
+          <Route exact path="/">
+            <Home />
+          </Route>
 
           <Route path="/home">
             <Home />
           </Route>
 
-          <Route path="/placeOrder">
-            <PlaceOrder />
-          </Route>
+          <PrivateRoute path="/cart/:id">
+            <Cart />
+          </PrivateRoute>
+
+          <PrivateRoute path="/checkout">
+            <Checkout />
+          </PrivateRoute>
+
+          <PrivateRoute path="/orders">
+            <Order />
+          </PrivateRoute>
 
           <PrivateRoute path="/admin">
             <Admin />
           </PrivateRoute>
 
-          <Route path="/login">
-            <Login></Login>
-          </Route>
-
-          <PrivateRoute path="/shipment">
-            <Shipment></Shipment>
-          </PrivateRoute>
-
-          <Route exact path="/">
+          <Route path="/deals">
             <Home />
           </Route>
-{/* 
-          <Route path="/product/:productKey">
-            <ProductDetail></ProductDetail>
-          </Route> */}
+
+          <Route path="/login">
+            <Login />
+          </Route>
 
           <Route path="*">
-            <NotFound></NotFound>
+            <NotFound />
           </Route>
 
         </Switch>

@@ -1,0 +1,22 @@
+.list-group-item{
+    background-color: transparent;
+    border: none;
+    color: #fff;
+}
+.list-group-item span{
+    margin-left: 10px;
+}
+.admin-card{
+    border: none;
+    color: #0C0C0C;
+}
+.admin-card .card-header{
+    text-align: left;
+    font-size: 30px;
+}
+.admin-card .card-body{
+    text-align: left;
+}
+.list-group a{
+text-decoration: none;
+}

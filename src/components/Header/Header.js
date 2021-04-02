@@ -4,27 +4,26 @@ import { UserContext } from '../../App';
 import './Header.css';
 
 const Header = () => {
-    const [loggedInUser, setLoggedInUser] = useContext(UserContext);
-
+    const [user, setUser] = useContext(UserContext);
     return (
-        <div style={{marginBottom: '80px'}} className="container">
+        <div className="container" style={{ alignSelf: 'flex-start' }}>
             <div className="row">
                 <nav className="navbar navbar-expand-lg navbar-light">
                     <div className="container-fluid">
-                        <Link to="/" className="navbar-brand" style={{fontSize: '35px', fontWeight: '700', color: '#0041C2'}}>Bird Box</Link>
+                        <Link style={{fontSize: '25px', color: 'slateblue', fontWeight: 'bold'}} className="navbar-brand" to="/">Bird Box</Link>
 
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
                             <span className="navbar-toggler-icon"></span>
                         </button>
 
                         <div className="collapse navbar-collapse" id="navbarScroll">
-                            <ul className="navbar-nav me-auto my-2 my-lg-0" style={{ justifyContent: 'flex-end', alignItems: 'center', 'width': '100%', fontSize: '20px'}}>
+                            <ul className="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style={{ justifyContent: 'flex-end', alignItems: 'center', 'width': '100%' }}>
                                 <li className="nav-item">
-                                    <Link to="/home" className="nav-link">Home</Link>
+                                    <Link to="/" className="nav-link">Home</Link>
                                 </li>
 
                                 <li className="nav-item">
-                                    <Link to="/placeOrder" className="nav-link">Orders</Link>
+                                    <Link to="/orders" className="nav-link">Orders</Link>
                                 </li>
 
                                 <li className="nav-item">
@@ -32,10 +31,15 @@ const Header = () => {
                                 </li>
 
                                 <li className="nav-item">
-                                    <Link to="/home" className="nav-link">Deals</Link>
+                                    <Link to="/deals" className="nav-link">Deals</Link>
                                 </li>
 
-                                <button style={{fontSize: '20px'}} className="btn" onClick={() => setLoggedInUser({})}>Login</button>
+                                <li className="nav-item">
+                                    {
+                                        user?.email ? <span className="nav-link">{user.name}</span> : <Link to="/login" className="nav-link"><button className="btn site-btn">Login</button></Link>
+                                    }
+
+                                </li>
 
                             </ul>
 
