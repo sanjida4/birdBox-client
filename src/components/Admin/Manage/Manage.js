@@ -7,14 +7,14 @@ const ManageBook = () => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        fetch('https://apple-pudding-44312.herokuapp.com/products')
+        fetch('https://apple-pudding-32420.herokuapp.com/products')
             .then(res => res.json())
             .then(data => setProducts(data))
             .catch(err => console.log(err));
     }, []);
 
     const handleDeleteProduct = id => {
-        fetch(`https://apple-pudding-44312.herokuapp.com/product/${id}`, {
+        fetch(`https://apple-pudding-32420.herokuapp.com/product/${id}`, {
             method: 'DELETE',
         })
             .then(res => res.json())

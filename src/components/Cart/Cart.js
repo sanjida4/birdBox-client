@@ -7,7 +7,7 @@ const Checkout = () => {
     const [product, setProduct] = useState({});
 
     useEffect(() => {
-        fetch(`https://apple-pudding-44312.herokuapp.com/product/${id}`)
+        fetch(`https://apple-pudding-32420.herokuapp.com/product/${id}`)
             .then(res => res.json())
             .then(data => setProduct(data))
             .catch(error => console.log(error))

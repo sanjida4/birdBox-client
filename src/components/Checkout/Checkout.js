@@ -15,7 +15,7 @@ const Checkout = () => {
 
     const proceedCheckout = data => {
         const orderData = { ...data, product: { ...product }, orderTime: new Date() }
-        fetch('https://apple-pudding-44312.herokuapp.com/order', {
+        fetch('https://apple-pudding-32420.herokuapp.com/addOrder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ const Checkout = () => {
     };
 
     useEffect(() => {
-        fetch(`https://apple-pudding-44312.herokuapp.com/product/${productId}`)
+        fetch(`https://apple-pudding-32420.herokuapp.com/product/${productId}`)
             .then(res => res.json())
             .then(data => {
                 data.quantity = 1;

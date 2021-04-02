@@ -25,7 +25,7 @@ const AddBook = () => {
 
     const onSubmit = (data, e) => {
         data.image = image;
-        fetch('https://apple-pudding-44312.herokuapp.com/addProduct', {
+        fetch('https://apple-pudding-32420.herokuapp.com/addProduct', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
