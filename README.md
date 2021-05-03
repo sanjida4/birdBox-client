@@ -1,4 +1,4 @@
-Welcome to Dev Shop ( An online shop for buying birds)
+Welcome to Bird Box ( An online shop for buying birds)
 
 -Project is hosted in firebase
 
@@ -7,7 +7,9 @@ Welcome to Dev Shop ( An online shop for buying birds)
 
 Live site: https://bird-box-f16a6.web.app/
 
+
 Used NPM Packages:
+
 
 -Create React App
 
@@ -25,6 +27,7 @@ Used NPM Packages:
 
 
 Available Features:
+
 
 -View all the birds
 
